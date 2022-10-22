@@ -41,6 +41,10 @@ public class MyArrayList<E> implements Collection<E> {
         }
     }
 
+    public void quickSort(){
+Arrays.sort(elementData);
+    }
+
     @Override
     public int size() {
         return size;
