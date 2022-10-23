@@ -28,21 +28,30 @@ public class MyArrayList<E> implements Collection<E> {
     }
 
     public void bubbleSort(Comparator<? super E> c) {
-        for (int i = 0; i < size - 1; i++) {
-            for (int j = size - 1; j > i; j--) {
+        boolean isSorted = true;
+        while (isSorted) {
+            isSorted = false;
+            for (int i = 0; i < size - 1; i++) {
                 if (
-                        c.compare((E) elementData[j - 1], (E) elementData[j]) > 1
+                        c.compare((E) elementData[i], (E) elementData[i + 1]) > 0
                 ) {
-                    Object tmp = elementData[j - 1];
-                    elementData[j - 1] = elementData[j];
-                    elementData[j] = tmp;
+                    Object tmp = elementData[i];
+                    elementData[i] = elementData[i + 1];
+                    elementData[i + 1] = tmp;
+                    isSorted = true;
                 }
+
             }
         }
     }
 
-    public void quickSort(){
-Arrays.sort(elementData);
+
+    public void quickSort(Comparator<? super E> c) {
+        quickSortMethod(elementData, 0, size - 1, (Comparator<Object>) c);
+    }
+
+    public void quickSort() {
+        Arrays.sort(elementData);
     }
 
     @Override
@@ -164,7 +173,7 @@ Arrays.sort(elementData);
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        MyArrayList<Object> a = new MyArrayList();
+        MyArrayList<Object> a = new MyArrayList<>();
         for (Object o : c) {
             if (this.contains(o))
                 a.add(o);
@@ -258,8 +267,6 @@ Arrays.sort(elementData);
 
         @Override
         public boolean hasNext() {
-
-//            return index < size;
             return index < size && elementData[index] != null;
         }
 
@@ -311,4 +318,41 @@ Arrays.sort(elementData);
         }
 
     }
+
+    private static void quickSortMethod(Object[] source, int from, int to, Comparator<Object> c) {
+        int leftMarker = from;
+        int rightMarker = to;
+        Object pivot = source[(leftMarker + rightMarker) / 2];
+        do {
+            // Двигаем левый маркер слева направо пока элемент меньше, чем pivot
+            while (c.compare(source[leftMarker], pivot) < 0) {
+                leftMarker++;
+            }
+            // Двигаем правый маркер, пока элемент больше, чем pivot
+            while (c.compare(source[rightMarker], pivot) > 0) {
+                rightMarker--;
+            }
+            // Проверим, не нужно обменять местами элементы, на которые указывают маркеры
+            if (leftMarker <= rightMarker) {
+                // Левый маркер будет меньше правого только если мы должны выполнить swap
+                if (leftMarker < rightMarker) {
+                    Object tmp = source[leftMarker];
+                    source[leftMarker] = source[rightMarker];
+                    source[rightMarker] = tmp;
+                }
+                // Сдвигаем маркеры, чтобы получить новые границы
+                leftMarker++;
+                rightMarker--;
+            }
+        } while (leftMarker <= rightMarker);
+
+        // Выполняем рекурсивно для частей
+        if (leftMarker < to) {
+            quickSortMethod(source, leftMarker, to, c);
+        }
+        if (from < rightMarker) {
+            quickSortMethod(source, from, rightMarker, c);
+        }
+    }
+
 }
